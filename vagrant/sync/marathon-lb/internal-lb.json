@@ -1,0 +1,36 @@
+{
+  "id": "/internal-lb-docker",
+  "cmd": null,
+  "cpus": 0.5,
+  "mem": 112,
+  "disk": 0,
+  "instances": 1,
+  "container": {
+    "type": "DOCKER",
+    "volumes": [
+      {
+        "containerPath": "/options.json",
+        "hostPath": "/home/vagrant/marathon-lb/options.json",
+        "mode": "RO"
+      }
+    ],
+    "docker": {
+      "image": "mesosphere/marathon-lb",
+      "network": "HOST",
+      "privileged": false,
+      "parameters": [],
+      "forcePullImage": false
+    }
+  },
+  "env": {
+    "PORTS": "9090",
+    "options": "options.json"
+  },
+  "portDefinitions": [
+    {
+      "port": 10000,
+      "protocol": "tcp",
+      "labels": {}
+    }
+  ]
+}

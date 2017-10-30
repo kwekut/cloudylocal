@@ -1,0 +1,29 @@
+{
+  "id": "/external-lb-docker",
+  "cmd": null,
+  "cpus": 0.5,
+  "mem": 112,
+  "disk": 0,
+  "instances": 1,
+  "container": {
+    "type": "DOCKER",
+    "volumes": [],
+    "docker": {
+      "image": "mesosphere/marathon-lb",
+      "network": "HOST",
+      "privileged": false,
+      "parameters": [],
+      "forcePullImage": false
+    }
+  },
+  "env": {
+    "PORTS": "9090"
+  },
+  "portDefinitions": [
+    {
+      "port": 10000,
+      "protocol": "tcp",
+      "labels": {}
+    }
+  ]
+}

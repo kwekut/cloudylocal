@@ -1,0 +1,27 @@
+---
+- hosts: slaves
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: configure the dns resolver nameserver 
+        lineinfile: dest=/etc/resolv.conf create=yes insertbefore=BOF line="nameserver 192.168.33.11" state=present  
+- hosts: masters
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: transfer mesos dns folder
+        synchronize: src=/home/vagrant/sync/mesos-dns/ dest=/home/vagrant/mesos-dns/
+      - name: configure the dns resolver nameserver 
+        lineinfile: dest=/etc/resolv.conf create=yes insertbefore=BOF line="nameserver 192.168.33.11" state=present
+      - name: install haproxy
+        yum: pkg=haproxy,bind-utils state=latest
+      - name: Creates haproxy directory /etc/haproxy
+        file: path=/etc/haproxy state=directory
+      - name: Creates dns directory /etc/mesos-dns
+        file: path=/etc/mesos-dns state=directory
+      - name: transfer config.json to master directory /etc/mesos-dns/
+        copy: src=/home/vagrant/sync/mesos-dns/config.json dest=/etc/mesos-dns/       
+      - name: download dns from github
+        get_url: url=https://github.com/mesosphere/mesos-dns/releases/download/v0.5.1/mesos-dns-v0.5.1-linux-amd64 dest=/etc/mesos-dns/mesos-dns mode=0755
+      - name: start marathon dns services
+        shell: 'curl -X POST "http://192.168.33.11:8080/v2/apps" -d @"/home/vagrant/mesos-dns/mesosdns.json" -H "Content-type: application/json"'

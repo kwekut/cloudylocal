@@ -1,0 +1,11 @@
+The SSH environment setup
+
+ Establish SSH trust
+# add ssh to mgmt node(client) from remote nodes(masters/slaves)
+1. do- sh populatessh --ask-pass (Check node lists)
+ 
+ Automated SSH auth
+# create SSH auth key for client node
+2. do- sh sshkeygen --ask-pass
+# Provide auto password/authentication - transfer key to remote nodes
+3. do- ansible playbook addkey.yml  --ask-pass (Applied to all remote nodes -masters/slaves)

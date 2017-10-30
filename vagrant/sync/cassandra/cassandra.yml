@@ -1,0 +1,19 @@
+---
+- hosts: slaves
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: open cassandra resource ports
+        lineinfile: dest=/etc/mesos-slave/resources create=yes state=present line="*ports:[31000-32000,7000-7001,7199-7199,9042-9042,9160-9160]*"
+      - name: create cassandra data directory /etc/cassandra/data
+        file: path=/etc/cassandra/data state=directory
+- hosts: masters
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: transfer cassandra folder
+        synchronize: src=/home/vagrant/sync/cassandra/ dest=/home/vagrant/cassandra/
+      - name: create cassandra directory /etc/cassandra/data
+        file: path=/etc/cassandra/data state=directory
+      - name: start cassandra on marathon 
+        shell: 'curl -X POST "http://192.168.33.11:8080/v2/apps" -d @"/home/vagrant/cassandra/cassandra.json" -H "Content-type: application/json"' 

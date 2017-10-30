@@ -1,0 +1,20 @@
+ 
+
+Build 
+# yum install git 
+$ git clone https://github.com/mesos/kafka
+$ cd kafka
+$ ./gradlew jar
+$ wget https://archive.apache.org/dist/kafka/0.8.2.2/kafka_2.10-0.8.2.2.tgz
+
+Build 
+# yum install git 
+$ git clone https://github.com/mesos/kafka
+$ cd kafka/src/docker
+# replace lines
+kafka_version=0.8.2.2             kafka_version=0.9.0.1
+scala_version=2.10                scala_version=2.11
+docker_tag=`whoami`/kafka-mesos   kwekut/kafka-mesosK9S11
+$ ./build-image.sh
+
+docker push kwekut/kafka-mesosK9S11

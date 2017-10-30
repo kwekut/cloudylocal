@@ -1,0 +1,22 @@
+---
+- hosts: master1
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: create making spark directory /tmp/spark
+        file: path=/tmp/spark state=directory
+      - name: delete old spark
+        file: path=/tmp/spark/spark-1.6.0 state=absent
+      - name: unzip spark image and change permission to executable
+        unarchive: src=/home/vagrant/sync/spark/spark-1.6.0.tgz dest=/tmp/spark mode=0777 owner=vagrant
+      - name: update heap size
+        shell: export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m"
+      - name: change-scala-version
+        shell: cd /tmp/spark/spark-1.6.0 && sudo ./dev/change-scala-version.sh 2.11
+      - name: bulid spark
+        shell: cd /tmp/spark/spark-1.6.0 && sudo ./make-distribution.sh --name spark-1.6.0-bin-hadoop2.6 --tgz -Phadoop-2.6 -Dscala-2.11 -DskipTests clean package
+      - name: copy to /vagrant directory
+        copy: dest=/vagrant/spark-1.6.0 src=/tmp/spark/spark-1.6.0
+      - name: cleanup dir
+        file: path=/tmp/spark state=absent
+

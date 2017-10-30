@@ -1,0 +1,1 @@
+ssh-keyscan  slave1 slave2 slave3 master1 >> /home/vagrant/.ssh/known_hosts

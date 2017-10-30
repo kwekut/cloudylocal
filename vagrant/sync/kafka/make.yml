@@ -1,0 +1,25 @@
+---
+- hosts: slave1
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: install unzip package
+        yum: pkg=unzip,git state=latest
+      - name: create play directory /etc/kafka/docker
+        file: path=/etc/kafka state=directory
+      - name: git clone mesos/kafka/docker
+        git: repo=https://github.com/mesos/kafka.git dest=/etc/kafka/docker force=yes
+      - name: update base dir
+        lineinfile: dest=/etc/kafka/docker/src/docker/build-image.sh regexp='^base_dir=../..' line="base_dir=/etc/kafka/docker" state=present create=True
+      - name: update kafka_version
+        lineinfile: dest=/etc/kafka/docker/src/docker/build-image.sh regexp='^kafka_version=0.8.2.2' line="kafka_version=0.9.0.1" state=present create=True
+      - name: update scala_version
+        lineinfile: dest=/etc/kafka/docker/src/docker/build-image.sh regexp='^scala_version=2.10' line="scala_version=2.11" state=present create=True
+      - name: update docker_tag
+        lineinfile: dest=/etc/kafka/docker/src/docker/build-image.sh regexp='^docker_tag=`whoami`/kafka-mesos' line="docker_tag=kwekut/kafka-mesos" state=present create=True
+      - name: chmod build-image
+        shell: sudo chmod 0777 /etc/kafka/docker/src/docker/build-image.sh
+      - name: build kafka docker image
+        shell: cd /etc/kafka/docker/src/docker && sudo build-image.sh
+      - name: push kafka docker image
+        shell: docker push kwekut/kafka-mesos

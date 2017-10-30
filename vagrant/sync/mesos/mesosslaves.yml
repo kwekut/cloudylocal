@@ -1,0 +1,30 @@
+---
+- hosts: slaves
+  remote_user: vagrant
+  gather_facts: yes
+  sudo: yes
+  tasks:
+      - name: install the mesosphere yum repo
+        yum: name=http://repos.mesosphere.com/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm state=present
+      - name: install rsync and unzip packages
+        yum: pkg=rsync,unzip,gzip state=latest
+      - name: install the mesos package
+        yum: pkg=mesos state=latest
+      - name: install the docker packages
+        yum: pkg=device-mapper-event-libs,docker state=latest
+      - name: configure docker containerizers
+        lineinfile: dest=/etc/mesos-slave/containerizers create=yes line="docker,mesos"
+      - name: configure docker reg timeout
+        lineinfile: dest=/etc/mesos-slave/executor_registration_timeout create=yes line="5mins" state=present
+      - name: remove default entries
+        replace: dest=/etc/mesos/zk regexp="^.*localhost" replace=""
+      - name: update the zookeeper master ip on all nodes
+        lineinfile: dest=/etc/mesos/zk regexp="^" line="zk://192.168.33.11:2181/mesos" state=present
+      - name: update ip dynamically via template
+        template: src=/home/vagrant/sync/mesos/ip.j2  dest=/etc/mesos-slave/ip 
+      - name: update hostname dynamically via template
+        template: src=/home/vagrant/sync/mesos/hostname.j2 dest=/etc/mesos-slave/hostname
+      - name: start the mesos slave 
+        service: name=mesos-slave state=started enabled=yes
+      - name: start docker
+        service: name=docker state=started enabled=yes

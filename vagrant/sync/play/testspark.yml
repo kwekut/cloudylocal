@@ -1,0 +1,35 @@
+---
+- hosts: master1
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: install gzip and unzip packages
+        yum: pkg=unzip,gzip state=latest
+      - name: delete old spark.tgz
+        file: path=/etc/spark-1.6.0-bin-hadoop2.6.tgz state=absent
+      - name: delete old spark
+        file: path=/etc/spark-1.6.0-bin-hadoop2.6 state=absent
+      - name: delete spark
+        file: path=/etc/spark state=absent
+      - name: unzip spark image and change permission to executable
+        unarchive: src=/home/vagrant/sync/spark/spark-1.6.0-bin-hadoop2.6.tgz dest=/ mode=0777 owner=vagrant
+      - name: transfer spark-env.sh to /etc/spark.../conf
+        copy: dest=/etc/spark-1.6.0-bin-hadoop2.6/conf/spark-env.sh src=/home/vagrant/sync/spark/spark-env.sh 
+      - name: transfer spark-defaults.conf to /etc/spark..../conf
+        copy: dest=/etc/spark-1.6.0-bin-hadoop2.6/conf/spark-defaults.conf src=/home/vagrant/sync/spark/spark-defaults.conf
+      - name: chmod spark-env.sh
+        shell: sudo chmod 0777 /etc/spark-1.6.0-bin-hadoop2.6/conf/spark-env.sh
+      - name: compress spark back to tar.gz
+        shell: sudo tar -zcvf /etc/spark-1.6.0-bin-hadoop2.6.tgz  /etc/spark-1.6.0-bin-hadoop2.6
+      - name: create play directory /etc/play
+        file: path=/etc/play state=directory
+      - name: create log directory /var/log/play
+        file: path=/var/log/play state=directory
+      - name: copy testspark.json to /etc/play
+        copy: dest=/etc/play/testspark.json src=/home/vagrant/sync/play/testspark.json
+      - name: delete old play directory 
+        file: path=/etc/play/testspark-1.0-SNAPSHOT state=absent
+      - name: unzip play image and change permission to executable
+        unarchive: src=/home/vagrant/sync/play/testspark-1.0-SNAPSHOT.zip dest=/etc/play mode=0777 owner=vagrant
+      - name: start test play spark on marathon 
+        shell: 'curl -X POST "http://192.168.33.11:8080/v2/apps" -d @"/etc/play/testspark.json" -H "Content-type: application/json"'

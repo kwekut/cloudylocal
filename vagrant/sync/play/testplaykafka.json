@@ -1,0 +1,8 @@
+{
+  "id": "testplaykafka",
+  "cmd": "sudo /etc/play/testkafka-1.0-SNAPSHOT/bin/testkafka",
+  "instances": 1,
+  "cpus": 0.5,
+  "mem": 126,
+  "constraints": [["hostname", "LIKE", "slave1"]]
+}

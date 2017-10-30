@@ -1,0 +1,11 @@
+---
+- hosts: masters
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: transfer app folder
+        synchronize: src=/home/vagrant/sync/marathon-lb/ dest=/home/vagrant/marathon-lb/
+      - name: load loadbalancer
+        shell: sudo docker pull mesosphere/marathon-lb
+      - name: marathon install external loadbalancer
+        shell: 'curl -X POST "http://192.168.33.11:8080/v2/apps" -d @"/home/vagrant/marathon-lb/external-lb.json" -H "Content-type: application/json"'

@@ -1,0 +1,32 @@
+{
+  "id": "/kafka-scheduler-coderfi",
+  "cmd": "kafka-mesos scheduler --master=192.168.33.11:5050 --zk=192.168.33.11:2181 --api=http://192.168.33.11:7000 --storage=zk:/kafka-mesos",
+  "cpus": 0.5,
+  "mem": 256,
+  "disk": 0,
+  "instances": 1,
+  "constraints": [["hostname", "LIKE", "master1"]],
+  "container": {
+    "type": "DOCKER",
+    "volumes": [],
+    "docker": {
+      "image": "coderfi/kafka-mesos",
+      "network": "HOST",
+      "privileged": false,
+      "parameters": [],
+      "forcePullImage": false
+    }
+  },
+  "env": {
+    "PORTS": "7000"
+  },
+  "portDefinitions": [
+    {
+      "port": 10001,
+      "protocol": "tcp",
+      "labels": {}
+    }
+  ],
+  "labels": {},
+  "healthChecks": []
+}

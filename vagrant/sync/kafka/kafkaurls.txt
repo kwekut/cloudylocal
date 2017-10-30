@@ -1,0 +1,15 @@
+#Use web browser or Curl
+
+http://192.168.33.11:7000/api/broker/list
+http://192.168.33.11:7000/api/broker/add?broker=0&cpus=0.25&mem=128&port=31000
+http://192.168.33.11:7000/api/broker/start?broker=0
+http://192.168.33.11:7000/api/broker/restart?broker=0
+http://192.168.33.11:7000/api/broker/stop?broker=0
+http://192.168.33.11:7000/api/broker/remove?broker=0
+
+http://192.168.33.11:7000/api/topic/list
+http://192.168.33.11:7000/api/topic/add?topic=grid
+http://192.168.33.11:7000/api/topic/update?topic=t&options=flush.ms%3D1000
+
+sudo docker exec -it image-name bash
+./kafka-mesos.sh broker log 0 --api=http://192.168.33.11:7000/

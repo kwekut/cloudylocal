@@ -1,0 +1,21 @@
+---
+- hosts: masters
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: install the docker package
+        yum: pkg=device-mapper-event-libs,docker state=latest
+      - name: install rsync and unzip packages
+        yum: pkg=rsync,unzip state=latest
+      - name: configure containerizers
+        lineinfile: dest=/etc/mesos-slave/containerizers create=yes line="docker,mesos"
+      - name: configure docker reg timeout
+        lineinfile: dest=/etc/mesos-slave/executor_registration_timeout create=yes line="5mins"
+      - name: configure mesos quorum
+        lineinfile: dest=/etc/mesos-master/quorum create=yes line="1"
+      - name: start docker
+        service: name=docker state=started enabled=yes
+      - name: pull zookeeper-exhibitor
+        shell: sudo docker pull mbabineau/zookeeper-exhibitor
+      - name: start zookeeper-exhibitor
+        shell: sudo docker run -d -p 8181:8181 -p 2181:2181 -p 2888:2888 -p 3888:3888 \ mbabineau/zookeeper-exhibitor:latest

@@ -1,0 +1,38 @@
+---
+- hosts: masters
+  remote_user: vagrant
+  sudo: yes
+  tasks:
+      - name: update the rsyslog config
+        template: src=/home/vagrant/sync/mesos/mesos.conf.j2 dest=/etc/rsyslog.d/mesos.conf
+      - name: restart rsyslog
+        shell: service rsyslog restart
+      - name: install the mesosphere yum repo
+        yum: name=http://repos.mesosphere.com/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm state=present
+      - name: install the mesos, marathon, chronos packages
+        yum: pkg=device-mapper-event-libs,mesos,marathon,chronos state=latest
+      - name: create /etc/mesos directory
+        file: path=/etc/mesos state=directory
+      - name: create  /etc/mesos-master directory
+        file: path=/etc/mesos-master/ state=directory
+      - name: create  /etc/marathon/conf directory
+        file: path=/etc/marathon/conf state=directory
+      - name: update the mesos master zk
+        lineinfile: dest=/etc/mesos/zk regexp='^' line="zk://192.168.33.11:2181/mesos" state=present create=True
+      - name: update the marathon master zk       
+        lineinfile: dest=/etc/marathon/conf/master regexp='^' line="zk://192.168.33.11:2181/mesos" state=present create=True
+      - name: update marathon zk       
+        lineinfile: dest=/etc/marathon/conf/zk regexp='^' line="zk://192.168.33.11:2181/marathon" state=present create=True
+      - name: configure mesos master hostname 
+        lineinfile: dest=/etc/mesos-master/hostname regexp='^' line="master1" state=present create=True
+      - name: configure marathon hostname       
+        lineinfile: dest=/etc/marathon/conf/hostname regexp='^' line="master1" state=present create=True
+      - name: configure mesos master IP Address 
+        lineinfile: dest=/etc/mesos-master/ip regexp='^' line="192.168.33.11" state=present create=True
+      - name: start up the mesos-master
+        service: name=mesos-master state=started enabled=yes
+      - name: make sure mesos-slave is running
+        service: name=mesos-slave state=started enabled=yes
+      - name: start marathon
+        service: name=marathon state=started enabled=yes
+

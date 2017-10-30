@@ -1,0 +1,12 @@
+{
+  "id": "open",
+  "cmd": "sudo /etc/play/open-1.0-SNAPSHOT/bin/open -Dconfig.file=/etc/play/play.conf -Dhttp.port=9000",
+  "instances": 1,
+  "cpus": 0.15,
+  "mem": 256,
+  "constraints": [["hostname","LIKE","master1"]],
+  "env": {
+    "MESOS_NATIVE_JAVA_LIBRARY": "/usr/lib/libmesos.so",
+    "SPARK_EXECUTOR_URI": "/etc/spark-1.6.0-bin-hadoop2.6"
+  }
+}
