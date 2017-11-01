@@ -3,5 +3,4 @@
 
 *.tgz
 *.jar
-*config.json 
-config.json
+**/mesos/config.json
