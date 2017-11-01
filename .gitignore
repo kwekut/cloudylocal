@@ -2,4 +2,4 @@
 #
 
 *.tgz
-*.jar
+*.jar"vagrant\sync\mesos-dns\config.json" 
